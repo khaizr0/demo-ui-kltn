@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { DocumentManagerModal } from "./DocumentModal"; // Updated import
 import type { Record } from "@/types";
 import { RecordFilter } from "./RecordFilter";
 import { RecordTable } from "./RecordTable";
@@ -27,7 +26,6 @@ export const StudentRepositoryView = () => {
     currentPage, setCurrentPage, totalPages, startIndex, currentRecords
   } = useRecordFilter(records, initialSearch);
 
-  const [selectedRecord, setSelectedRecord] = useState<Record | null>(null);
   const [recordToDelete, setRecordToDelete] = useState<Record | null>(null);
 
   const handleDeleteRecord = () => {
@@ -57,13 +55,9 @@ export const StudentRepositoryView = () => {
         totalPages={totalPages}
         onPageChange={setCurrentPage}
         user={mockUser}
-        onEdit={setSelectedRecord}
+        onEdit={() => {}} // No-op, navigation handled in Row
         onDelete={setRecordToDelete}
       />
-
-      {selectedRecord && (
-        <DocumentManagerModal record={selectedRecord} onClose={() => setSelectedRecord(null)} />
-      )}
 
       <DeleteRecordDialog
         record={recordToDelete}
