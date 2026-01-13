@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Edit, FileText, Trash2, User } from "lucide-react";
+import { Edit, Trash2, User, FilePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import type { Patient } from "@/types";
+import { formatDate } from "@/lib/utils";
+import { CreateRecordTypeDialog } from "./CreateRecordTypeDialog";
 
 interface PatientTableRowProps {
   patient: Patient;
@@ -11,6 +14,12 @@ interface PatientTableRowProps {
 
 export const PatientTableRow = ({ patient }: PatientTableRowProps) => {
   const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleCreateRecord = (type: "internal" | "surgery") => {
+    setIsDialogOpen(false);
+    navigate(`/record/create/${patient.id}?type=${type}`);
+  };
 
   return (
     <TableRow className="hover:bg-gray-50 transition group">
@@ -33,7 +42,7 @@ export const PatientTableRow = ({ patient }: PatientTableRowProps) => {
           </div>
         </div>
       </TableCell>
-      <TableCell className="text-gray-600">{patient.dob}</TableCell>
+      <TableCell className="text-gray-600">{formatDate(patient.dob)}</TableCell>
       <TableCell className="text-gray-600">
         {patient.age} / {patient.gender}
       </TableCell>
@@ -62,9 +71,10 @@ export const PatientTableRow = ({ patient }: PatientTableRowProps) => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 h-8 px-2"
+            onClick={() => setIsDialogOpen(true)}
+            className="text-green-600 hover:text-green-800 hover:bg-green-50 h-8 px-2"
           >
-             <FileText size={14} className="mr-1" /> HSBA
+             <FilePlus size={14} className="mr-1" /> Tạo HSBA
           </Button>
           <Button
             variant="ghost"
@@ -73,6 +83,12 @@ export const PatientTableRow = ({ patient }: PatientTableRowProps) => {
           >
             <Trash2 size={14} className="mr-1" /> Xóa
           </Button>
+          
+          <CreateRecordTypeDialog 
+            open={isDialogOpen} 
+            onOpenChange={setIsDialogOpen}
+            onSelect={handleCreateRecord}
+          />
         </div>
       </TableCell>
     </TableRow>
