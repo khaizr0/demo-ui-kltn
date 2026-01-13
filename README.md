@@ -1,1 +1,1 @@
-# demo-generative-ui
+# VIbe-coding
