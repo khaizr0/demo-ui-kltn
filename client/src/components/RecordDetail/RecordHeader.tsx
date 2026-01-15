@@ -18,8 +18,8 @@ export const RecordHeader = ({
   const navigate = useNavigate();
 
   return (
-    <div className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 mb-6 px-4 py-3 shadow-sm">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 mb-6 px-6 py-3 shadow-sm">
+      <div className="w-full flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"

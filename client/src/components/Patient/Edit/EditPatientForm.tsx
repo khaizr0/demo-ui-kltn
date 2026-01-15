@@ -57,7 +57,7 @@ export const EditPatientForm = () => {
   if (!patientToEdit) return <div className="p-8 text-center text-gray-500">Bệnh nhân không tồn tại</div>;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
+    <div className="w-full p-4 md:p-6">
         <Button 
           variant="outline"
           onClick={() => navigate('/patients')}

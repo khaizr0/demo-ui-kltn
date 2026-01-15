@@ -40,7 +40,7 @@ export const EditRecordView = () => {
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-10 pt-6">
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="w-full px-6">
          <RecordForm 
             mode="edit"
             record={record} 

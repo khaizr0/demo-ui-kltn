@@ -99,7 +99,7 @@ export const RecordDetailView = () => {
         isDownloading={isDownloading}
       />
 
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="w-full px-6">
         <div className="flex flex-col lg:flex-row gap-8 relative items-start">
           <NavigationSidebar onScrollTo={scrollToSection} />
 

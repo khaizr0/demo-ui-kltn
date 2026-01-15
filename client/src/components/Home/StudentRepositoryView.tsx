@@ -36,7 +36,7 @@ export const StudentRepositoryView = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
+    <div className="w-full p-4 md:p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Kho Hồ Sơ Bệnh Án</h1>
       </div>

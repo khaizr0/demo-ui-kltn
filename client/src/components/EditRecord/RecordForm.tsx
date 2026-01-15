@@ -241,7 +241,7 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[900px]">
           <TabsTrigger value="general">Thông Tin Chung</TabsTrigger>
           <TabsTrigger value="medical">Bệnh Án Chi Tiết</TabsTrigger>
           <TabsTrigger value="documents">Tài Liệu Đính Kèm</TabsTrigger>

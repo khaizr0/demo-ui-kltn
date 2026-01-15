@@ -45,7 +45,7 @@ export const AddPatientForm = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-6">
+    <div className="w-full p-4 md:p-6">
         <Button 
           variant="outline"
           onClick={() => navigate('/patients')}
