@@ -42,21 +42,39 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
     handleChange("transfers", newTransfers);
   };
 
+  const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value; // Format: YYYY-MM-DDTHH:MM
+    if (val) {
+      const [date, time] = val.split('T');
+      setFormData((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          admissionDate: date,
+          managementData: {
+            ...prev.managementData,
+            admissionTime: time,
+          },
+        };
+      });
+    }
+  };
+
+  // Combine date and time for input value
+  const dateTimeValue = formData.admissionDate && managementData.admissionTime 
+    ? `${formData.admissionDate}T${managementData.admissionTime}` 
+    : "";
+
   return (
     <Card className="shadow-sm border-gray-200">
-      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
-        <CardTitle className="text-lg font-bold text-gray-800 uppercase">
-          II. Quản Lý Người Bệnh
-        </CardTitle>
-      </CardHeader>
       <CardContent className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>10. Vào viện lúc</Label>
             <Input
               type="datetime-local"
-              value={managementData.admissionTime?.replace(" ", "T") || ""}
-              onChange={(e) => handleChange("admissionTime", e.target.value)}
+              value={dateTimeValue}
+              onChange={handleDateTimeChange}
             />
           </div>
           <div className="space-y-2">

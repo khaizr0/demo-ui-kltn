@@ -79,7 +79,7 @@ export const DocumentSection = ({ formData, setFormData }: DocumentSectionProps)
 
       {/* Upload Form */}
       <div className="mb-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4">
-        <form onSubmit={handleUpload} className="flex flex-col md:flex-row gap-3 items-center">
+        <div className="flex flex-col md:flex-row gap-3 items-center">
           <select
             className="p-2 border border-gray-300 rounded-md text-sm outline-none w-full md:w-40"
             value={uploadType}
@@ -99,12 +99,13 @@ export const DocumentSection = ({ formData, setFormData }: DocumentSectionProps)
           />
           <button
             disabled={!selectedFile}
-            type="submit"
+            type="button"
+            onClick={handleUpload}
             className="px-4 py-2 bg-gray-800 text-white rounded-md text-sm font-medium hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap transition"
           >
             <Upload size={16} className="inline mr-1" /> Tải lên
           </button>
-        </form>
+        </div>
       </div>
 
       {/* Document List Table */}

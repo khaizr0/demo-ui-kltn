@@ -26,11 +26,6 @@ export const TreatmentSection = ({ formData, setFormData }: TreatmentSectionProp
 
   return (
     <Card className="shadow-sm border-gray-200">
-      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
-        <CardTitle className="text-lg font-bold text-gray-800 uppercase">
-          C. Tiên Lượng & Hướng Điều Trị
-        </CardTitle>
-      </CardHeader>
       <CardContent className="p-6 space-y-6">
         <div className="space-y-2">
             <Label>Tiên lượng</Label>

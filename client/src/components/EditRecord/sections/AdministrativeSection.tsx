@@ -9,11 +9,6 @@ interface AdministrativeSectionProps {
 export const AdministrativeSection = ({ patient }: AdministrativeSectionProps) => {
   return (
     <Card className="shadow-sm border-gray-200">
-      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
-        <CardTitle className="text-lg font-bold text-gray-800 uppercase">
-          I. Hành Chính
-        </CardTitle>
-      </CardHeader>
       <CardContent className="p-6 space-y-1">
         <InfoRow label="1. Họ và tên" value={patient.fullName} />
         <InfoRow 

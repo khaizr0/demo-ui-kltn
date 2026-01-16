@@ -34,11 +34,6 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
 
   return (
     <Card className="shadow-sm border-gray-200">
-      <CardHeader className="bg-gray-50/50 border-b border-gray-100 py-4">
-        <CardTitle className="text-lg font-bold text-gray-800 uppercase">
-          III. Chẩn Đoán
-        </CardTitle>
-      </CardHeader>
       <CardContent className="p-6 space-y-6">
         {/* 18. Nơi chuyển đến */}
         <div className="space-y-2">

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Save, Plus, FileText, User, Activity, Stethoscope, LogOut, ClipboardList, Thermometer, Pill, Paperclip } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Plus, FileText, User, Activity, LogOut, ClipboardList, Thermometer, Pill, ChevronDown, ChevronRight, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { Record, Patient } from "@/types";
 
 import { AdministrativeSection } from "./sections/AdministrativeSection";
@@ -140,24 +141,54 @@ const prepareRecordData = (record: Record): Record => {
   return initializedData;
 };
 
-const GENERAL_SECTIONS = [
+interface SectionItem {
+  id: string;
+  label: string;
+  icon: any;
+  subSections?: SectionItem[];
+}
+
+const FORM_SECTIONS: SectionItem[] = [
   { id: "administrative", label: "I. Hành Chính", icon: User },
   { id: "management", label: "II. Quản Lý Người Bệnh", icon: LogOut },
   { id: "diagnosis", label: "III. Chẩn Đoán", icon: Activity },
   { id: "discharge", label: "IV. Tình Trạng Ra Viện", icon: FileText },
+  {
+    id: "medical_record_group",
+    label: "A. Bệnh Án",
+    icon: ClipboardList,
+    subSections: [
+      { id: "history", label: "1. Bệnh Sử & Tiền Sử", icon: ClipboardList },
+      { id: "examination", label: "2. Khám Bệnh", icon: Thermometer },
+      { id: "treatment", label: "3. Tiên Lượng & Điều Trị", icon: Pill },
+    ],
+  },
 ];
 
-const MEDICAL_SECTIONS = [
-  { id: "history", label: "A. Bệnh Án", icon: ClipboardList },
-  { id: "examination", label: "B. Khám Bệnh", icon: Thermometer },
-  { id: "treatment", label: "C. Tiên Lượng & Điều Trị", icon: Pill },
-];
+// Helper to flatten sections for navigation
+const getFlattenedSections = () => {
+  const flattened: { id: string; label: string }[] = [];
+  FORM_SECTIONS.forEach((section) => {
+    if (section.subSections) {
+      section.subSections.forEach((sub) => {
+        flattened.push({ id: sub.id, label: sub.label });
+      });
+    } else {
+      flattened.push({ id: section.id, label: section.label });
+    }
+  });
+  return flattened;
+};
 
 export const RecordForm = ({ record, patient, mode, initialType = "internal", onSubmit, onCancel }: RecordFormProps) => {
   const [formData, setFormData] = useState<Record | null>(null);
-  const [activeTab, setActiveTab] = useState("general");
-  const [activeGeneralSection, setActiveGeneralSection] = useState("administrative");
-  const [activeMedicalSection, setActiveMedicalSection] = useState("history");
+  const [activeTab, setActiveTab] = useState("details"); // 'details' or 'documents'
+  
+  // Initialize with the first section
+  const [activeSection, setActiveSection] = useState("administrative");
+  
+  // State for collapsible sidebar group
+  const [isMedicalGroupOpen, setIsMedicalGroupOpen] = useState(true);
 
   useEffect(() => {
     if (mode === "create" && patient) {
@@ -178,49 +209,41 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
 
   const isCreate = mode === "create";
   const typeLabel = (formData?.type || initialType) === "surgery" ? "Ngoại Khoa" : "Nội Khoa";
+  const flattenedSections = getFlattenedSections();
+  const currentSectionIndex = flattenedSections.findIndex((s) => s.id === activeSection);
 
-  const currentGeneralIndex = GENERAL_SECTIONS.findIndex(s => s.id === activeGeneralSection);
-  const handleNextGeneralSection = () => {
-    if (currentGeneralIndex < GENERAL_SECTIONS.length - 1) {
-      setActiveGeneralSection(GENERAL_SECTIONS[currentGeneralIndex + 1].id);
+  const handleNextSection = () => {
+    if (currentSectionIndex < flattenedSections.length - 1) {
+      const nextId = flattenedSections[currentSectionIndex + 1].id;
+      setActiveSection(nextId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      setActiveTab("medical");
-      setActiveMedicalSection("history");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-  const handlePrevGeneralSection = () => {
-    if (currentGeneralIndex > 0) {
-      setActiveGeneralSection(GENERAL_SECTIONS[currentGeneralIndex - 1].id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  const currentMedicalIndex = MEDICAL_SECTIONS.findIndex(s => s.id === activeMedicalSection);
-  const handleNextMedicalSection = () => {
-    if (currentMedicalIndex < MEDICAL_SECTIONS.length - 1) {
-      setActiveMedicalSection(MEDICAL_SECTIONS[currentMedicalIndex + 1].id);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Auto-open group if navigating into it
+      if (["history", "examination", "treatment"].includes(nextId)) {
+        setIsMedicalGroupOpen(true);
+      }
     } else {
       setActiveTab("documents");
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-  const handlePrevMedicalSection = () => {
-    if (currentMedicalIndex > 0) {
-      setActiveMedicalSection(MEDICAL_SECTIONS[currentMedicalIndex - 1].id);
+
+  const handlePrevSection = () => {
+    if (currentSectionIndex > 0) {
+      const prevId = flattenedSections[currentSectionIndex - 1].id;
+      setActiveSection(prevId);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      setActiveTab("general");
-      setActiveGeneralSection("discharge");
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Auto-open group if navigating into it
+       if (["history", "examination", "treatment"].includes(prevId)) {
+        setIsMedicalGroupOpen(true);
+      }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 pb-20">
-      <div className="flex items-center justify-between mb-2 border-b border-gray-200 pb-4">
+    <form onSubmit={handleSubmit} className="space-y-6 h-[calc(100vh-100px)] flex flex-col">
+      <div className="flex-none flex items-center justify-between mb-2 border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             {isCreate ? "Tạo Hồ Sơ Bệnh Án Mới" : "Chỉnh Sửa Hồ Sơ Bệnh Án"}
@@ -240,25 +263,76 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[900px]">
-          <TabsTrigger value="general">Thông Tin Chung</TabsTrigger>
-          <TabsTrigger value="medical">Bệnh Án Chi Tiết</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex-1 flex flex-col overflow-hidden">
+        <TabsList className="grid w-full grid-cols-2 lg:w-[600px] flex-none">
+          <TabsTrigger value="details">Thông Tin Chi Tiết</TabsTrigger>
           <TabsTrigger value="documents">Tài Liệu Đính Kèm</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="mt-6 animate-in fade-in slide-in-from-bottom-2">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            <div className="w-full lg:w-72 flex-shrink-0 space-y-1 lg:sticky lg:top-6">
-              {GENERAL_SECTIONS.map((section) => {
-                const isActive = activeGeneralSection === section.id;
+        <TabsContent value="details" className="mt-6 animate-in fade-in slide-in-from-bottom-2 flex-1 overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-8 items-start h-full">
+            {/* Sidebar */}
+            <div className="w-full lg:w-72 flex-shrink-0 space-y-1 h-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+              {FORM_SECTIONS.map((section) => {
                 const Icon = section.icon;
+                
+                if (section.subSections) {
+                  const isChildActive = section.subSections.some(sub => sub.id === activeSection);
+                  
+                  return (
+                    <Collapsible
+                      key={section.id}
+                      open={isMedicalGroupOpen}
+                      onOpenChange={setIsMedicalGroupOpen}
+                      className="space-y-1"
+                    >
+                      <CollapsibleTrigger asChild>
+                         <Button
+                          type="button"
+                          variant="ghost"
+                          className={`w-full justify-between text-left h-auto py-3 px-4 rounded-lg font-bold transition-all ${
+                            isChildActive ? "text-vlu-red bg-red-50" : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <Icon size={18} className="mr-3" />
+                            {section.label}
+                          </div>
+                          {isMedicalGroupOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pl-4 space-y-1">
+                        {section.subSections.map((sub) => {
+                           const isSubActive = activeSection === sub.id;
+                           return (
+                             <Button
+                              key={sub.id}
+                              type="button"
+                              variant="ghost"
+                              onClick={() => { setActiveSection(sub.id); }}
+                              className={`w-full justify-start text-left h-auto py-2 px-4 rounded-lg font-medium transition-all text-sm ${
+                                isSubActive 
+                                  ? "bg-vlu-red text-white hover:bg-red-800 shadow-sm" 
+                                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                              }`}
+                            >
+                              <span className="mr-2 opacity-70">•</span>
+                              {sub.label}
+                            </Button>
+                           );
+                        })}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                }
+
+                const isActive = activeSection === section.id;
                 return (
                   <Button
                     key={section.id}
                     type="button"
                     variant="ghost"
-                    onClick={() => { setActiveGeneralSection(section.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    onClick={() => { setActiveSection(section.id); }}
                     className={`w-full justify-start text-left h-auto py-3 px-4 rounded-lg font-medium transition-all ${
                       isActive ? "bg-vlu-red text-white hover:bg-red-800 shadow-sm" : "bg-white text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200"
                     }`}
@@ -269,79 +343,58 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
                 );
               })}
             </div>
-            <div className="flex-1 w-full min-w-0">
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                {activeGeneralSection === "administrative" && <AdministrativeSection patient={patient} />}
-                {activeGeneralSection === "management" && <PatientManagementSection formData={formData} setFormData={setFormData} />}
-                {activeGeneralSection === "diagnosis" && <DiagnosisSection formData={formData} setFormData={setFormData} />}
-                {activeGeneralSection === "discharge" && <DischargeStatusSection formData={formData} setFormData={setFormData} />}
-              </div>
-              <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
-                <Button type="button" variant="outline" onClick={handlePrevGeneralSection} disabled={currentGeneralIndex === 0} className={currentGeneralIndex === 0 ? "opacity-0 pointer-events-none" : ""}>
-                  <ArrowLeft size={16} className="mr-2" /> Quay lại
-                </Button>
-                <Button type="button" onClick={handleNextGeneralSection} className="bg-black hover:bg-gray-800 text-white">
-                  {currentGeneralIndex < GENERAL_SECTIONS.length - 1 ? `Tiếp tục: ${GENERAL_SECTIONS[currentGeneralIndex + 1].label.split(". ")[1]}` : "Tiếp tục: Bệnh Án Chi Tiết"}
-                  <ArrowRight size={16} className="ml-2" />
-                </Button>
+
+            {/* Main Content Area */}
+            <div className="flex-1 w-full min-w-0 h-full overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-full flex flex-col">
+                 <div className="flex-1">
+                    {activeSection === "administrative" && <AdministrativeSection patient={patient} />}
+                    {activeSection === "management" && <PatientManagementSection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "diagnosis" && <DiagnosisSection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "discharge" && <DischargeStatusSection formData={formData} setFormData={setFormData} />}
+                    
+                    {activeSection === "history" && <MedicalHistorySection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "examination" && <ExaminationSection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "treatment" && <TreatmentSection formData={formData} setFormData={setFormData} />}
+                 </div>
+              
+                  {/* Navigation Footer */}
+                  <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200 pb-10">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handlePrevSection} 
+                      disabled={currentSectionIndex === 0} 
+                      className={currentSectionIndex === 0 ? "opacity-0 pointer-events-none" : ""}
+                    >
+                      <ArrowLeft size={16} className="mr-2" /> Quay lại
+                    </Button>
+                    
+                    <Button type="button" onClick={handleNextSection} className="bg-black hover:bg-gray-800 text-white">
+                      {currentSectionIndex < flattenedSections.length - 1 
+                        ? `Tiếp tục: ${flattenedSections[currentSectionIndex + 1].label.replace(/^[IV0-9]+\.\s/, "")}` 
+                        : "Tiếp tục: Tài Liệu Đính Kèm"}
+                      <ArrowRight size={16} className="ml-2" />
+                    </Button>
+                  </div>
               </div>
             </div>
           </div>
         </TabsContent>
 
-        <TabsContent value="medical" className="mt-6 animate-in fade-in slide-in-from-bottom-2">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            <div className="w-full lg:w-72 flex-shrink-0 space-y-1 lg:sticky lg:top-6">
-              {MEDICAL_SECTIONS.map((section) => {
-                const isActive = activeMedicalSection === section.id;
-                const Icon = section.icon;
-                return (
-                  <Button
-                    key={section.id}
-                    type="button"
-                    variant="ghost"
-                    onClick={() => { setActiveMedicalSection(section.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                    className={`w-full justify-start text-left h-auto py-3 px-4 rounded-lg font-medium transition-all ${
-                      isActive ? "bg-vlu-red text-white hover:bg-red-800 shadow-sm" : "bg-white text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200"
-                    }`}
-                  >
-                    <Icon size={18} className={`mr-3 ${isActive ? "text-white" : "text-gray-500"}`} />
-                    {section.label}
-                  </Button>
-                );
-              })}
-            </div>
-            <div className="flex-1 w-full min-w-0">
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                {activeMedicalSection === "history" && <MedicalHistorySection formData={formData} setFormData={setFormData} />}
-                {activeMedicalSection === "examination" && <ExaminationSection formData={formData} setFormData={setFormData} />}
-                {activeMedicalSection === "treatment" && <TreatmentSection formData={formData} setFormData={setFormData} />}
-              </div>
-              <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
-                <Button type="button" variant="outline" onClick={handlePrevMedicalSection}>
-                  <ArrowLeft size={16} className="mr-2" />
-                  {currentMedicalIndex === 0 ? "Quay lại: Thông Tin Chung" : "Quay lại"}
-                </Button>
-                <Button type="button" onClick={handleNextMedicalSection} className="bg-black hover:bg-gray-800 text-white">
-                  Tiếp tục: Tài Liệu Đính Kèm
-                  <ArrowRight size={16} className="ml-2" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="documents" className="mt-6 animate-in fade-in slide-in-from-bottom-2">
-            <DocumentSection formData={formData} setFormData={setFormData} />
-            
-            <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
-                <Button type="button" variant="outline" onClick={() => { setActiveTab("medical"); setActiveMedicalSection("treatment"); }}>
-                  <ArrowLeft size={16} className="mr-2" /> Quay lại: Bệnh Án Chi Tiết
-                </Button>
-                <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[150px]">
-                    {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
-                    {isCreate ? "Hoàn tất & Tạo" : "Lưu Thay Đổi"}
-                </Button>
+        <TabsContent value="documents" className="mt-6 animate-in fade-in slide-in-from-bottom-2 flex-1 overflow-hidden">
+             <div className="h-full overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-10">
+                <DocumentSection formData={formData} setFormData={setFormData} />
+                
+                <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
+                    <Button type="button" variant="outline" onClick={() => { setActiveTab("details"); setActiveSection("treatment"); }}>
+                      <ArrowLeft size={16} className="mr-2" /> Quay lại: Chi Tiết Bệnh Án
+                    </Button>
+                    <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[150px]">
+                        {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
+                        {isCreate ? "Hoàn tất & Tạo" : "Lưu Thay Đổi"}
+                    </Button>
+                </div>
             </div>
         </TabsContent>
       </Tabs>
