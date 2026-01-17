@@ -6,12 +6,14 @@ import type { Record } from "@/types";
 interface MedicalHistorySectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const MedicalHistorySection = ({ formData, setFormData }: MedicalHistorySectionProps) => {
+export const MedicalHistorySection = ({ formData, setFormData, readOnly = false }: MedicalHistorySectionProps) => {
   const content = formData.medicalRecordContent;
 
   const handleChange = (field: string, value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       return {
@@ -33,6 +35,7 @@ export const MedicalHistorySection = ({ formData, setFormData }: MedicalHistoryS
             value={content.reason}
             onChange={(e) => handleChange("reason", e.target.value)}
             className="min-h-[60px]"
+            disabled={readOnly}
           />
         </div>
         
@@ -42,6 +45,7 @@ export const MedicalHistorySection = ({ formData, setFormData }: MedicalHistoryS
             value={content.pathologicalProcess}
             onChange={(e) => handleChange("pathologicalProcess", e.target.value)}
             className="min-h-[100px]"
+            disabled={readOnly}
           />
         </div>
         
@@ -54,6 +58,7 @@ export const MedicalHistorySection = ({ formData, setFormData }: MedicalHistoryS
                     value={content.personalHistory}
                     onChange={(e) => handleChange("personalHistory", e.target.value)}
                     className="min-h-[80px]"
+                    disabled={readOnly}
                 />
               </div>
               <div>
@@ -62,6 +67,7 @@ export const MedicalHistorySection = ({ formData, setFormData }: MedicalHistoryS
                     value={content.familyHistory}
                     onChange={(e) => handleChange("familyHistory", e.target.value)}
                     className="min-h-[80px]"
+                    disabled={readOnly}
                 />
               </div>
           </div>

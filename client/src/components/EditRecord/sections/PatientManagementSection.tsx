@@ -8,12 +8,14 @@ import type { Record, Transfer } from "@/types";
 interface PatientManagementSectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const PatientManagementSection = ({ formData, setFormData }: PatientManagementSectionProps) => {
+export const PatientManagementSection = ({ formData, setFormData, readOnly = false }: PatientManagementSectionProps) => {
   const managementData = formData.managementData;
 
   const handleChange = (field: string, value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       return {
@@ -27,22 +29,26 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
   };
 
   const handleTransferChange = (index: number, field: keyof Transfer, value: any) => {
+    if (readOnly) return;
     const newTransfers = [...managementData.transfers];
     newTransfers[index] = { ...newTransfers[index], [field]: value };
     handleChange("transfers", newTransfers);
   };
 
   const addTransfer = () => {
+    if (readOnly) return;
     const newTransfer: Transfer = { department: "", date: "", days: 0, time: "" };
     handleChange("transfers", [...managementData.transfers, newTransfer]);
   };
 
   const removeTransfer = (index: number) => {
+    if (readOnly) return;
     const newTransfers = managementData.transfers.filter((_, i) => i !== index);
     handleChange("transfers", newTransfers);
   };
 
   const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (readOnly) return;
     const val = e.target.value; // Format: YYYY-MM-DDTHH:MM
     if (val) {
       const [date, time] = val.split('T');
@@ -75,6 +81,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
               type="datetime-local"
               value={dateTimeValue}
               onChange={handleDateTimeChange}
+              disabled={readOnly}
             />
           </div>
           <div className="space-y-2">
@@ -83,6 +90,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
               value={managementData.admissionType || ""}
               onChange={(e) => handleChange("admissionType", e.target.value)}
               placeholder="Ví dụ: Cấp cứu, KKB..."
+              disabled={readOnly}
             />
           </div>
           <div className="space-y-2">
@@ -91,6 +99,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
               value={managementData.referralSource || ""}
               onChange={(e) => handleChange("referralSource", e.target.value)}
               placeholder="Cơ quan y tế, Tự đến..."
+              disabled={readOnly}
             />
           </div>
           <div className="space-y-2">
@@ -99,6 +108,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
               type="number"
               value={managementData.admissionCount || 1}
               onChange={(e) => handleChange("admissionCount", e.target.value)}
+              disabled={readOnly}
             />
           </div>
         </div>
@@ -106,9 +116,11 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label className="text-base font-semibold">14. Chuyển khoa</Label>
-            <Button type="button" variant="outline" size="sm" onClick={addTransfer} className="h-8">
-              <Plus size={14} className="mr-1" /> Thêm khoa
-            </Button>
+            {!readOnly && (
+                <Button type="button" variant="outline" size="sm" onClick={addTransfer} className="h-8">
+                <Plus size={14} className="mr-1" /> Thêm khoa
+                </Button>
+            )}
           </div>
           
           <div className="space-y-3">
@@ -121,6 +133,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                     onChange={(e) => handleTransferChange(index, "department", e.target.value)}
                     placeholder="Tên khoa"
                     className="h-9 bg-white"
+                    disabled={readOnly}
                   />
                 </div>
                 <div className="md:col-span-3 space-y-1">
@@ -130,6 +143,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                     value={transfer.date}
                     onChange={(e) => handleTransferChange(index, "date", e.target.value)}
                     className="h-9 bg-white"
+                    disabled={readOnly}
                   />
                 </div>
                  <div className="md:col-span-2 space-y-1">
@@ -139,6 +153,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                     value={transfer.time || ""}
                     onChange={(e) => handleTransferChange(index, "time", e.target.value)}
                     className="h-9 bg-white"
+                    disabled={readOnly}
                   />
                 </div>
                 <div className="md:col-span-2 space-y-1">
@@ -148,12 +163,15 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                     value={transfer.days}
                     onChange={(e) => handleTransferChange(index, "days", e.target.value)}
                     className="h-9 bg-white"
+                    disabled={readOnly}
                   />
                 </div>
                  <div className="md:col-span-1 flex justify-center pb-1">
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeTransfer(index)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50">
-                    <Trash2 size={16} />
-                  </Button>
+                  {!readOnly && (
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeTransfer(index)} className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50">
+                        <Trash2 size={16} />
+                      </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -166,6 +184,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                  <Input
                   value={managementData.hospitalTransfer?.type || ""}
                   onChange={(e) => handleChange("hospitalTransfer", { ...managementData.hospitalTransfer, type: e.target.value })}
+                  disabled={readOnly}
                 />
              </div>
               <div className="space-y-2">
@@ -173,6 +192,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                  <Input
                   value={managementData.hospitalTransfer?.destination || ""}
                    onChange={(e) => handleChange("hospitalTransfer", { ...managementData.hospitalTransfer, destination: e.target.value })}
+                   disabled={readOnly}
                 />
              </div>
         </div>
@@ -184,6 +204,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                   value={managementData.dischargeType || ""}
                   onChange={(e) => handleChange("dischargeType", e.target.value)}
                    placeholder="Ra viện, chuyển viện, trốn viện..."
+                   disabled={readOnly}
                 />
              </div>
               <div className="space-y-2">
@@ -192,6 +213,7 @@ export const PatientManagementSection = ({ formData, setFormData }: PatientManag
                   type="number"
                   value={managementData.totalDays || 0}
                    onChange={(e) => handleChange("totalDays", e.target.value)}
+                   disabled={readOnly}
                 />
              </div>
         </div>

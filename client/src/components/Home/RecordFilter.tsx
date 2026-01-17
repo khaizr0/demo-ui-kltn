@@ -30,8 +30,8 @@ export const RecordFilter = ({
             <Search size={16} className="text-gray-400" />
           </div>
           <Input
-            placeholder="Tìm kiếm theo tên hoặc mã hồ sơ..."
             className="pl-9"
+            placeholder="Tìm kiếm theo Mã lưu trữ, tên hoặc số cccd"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
           />

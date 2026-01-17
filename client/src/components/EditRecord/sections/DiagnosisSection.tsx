@@ -7,12 +7,14 @@ import type { Record } from "@/types";
 interface DiagnosisSectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProps) => {
+export const DiagnosisSection = ({ formData, setFormData, readOnly = false }: DiagnosisSectionProps) => {
   const diagnosisInfo = formData.diagnosisInfo;
 
   const handleChange = (path: string[], value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       
@@ -43,12 +45,14 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                 placeholder="Tên chẩn đoán"
                 value={diagnosisInfo.transferDiagnosis.name}
                 onChange={(e) => handleChange(['transferDiagnosis', 'name'], e.target.value)}
+                disabled={readOnly}
              />
              <Input 
                 placeholder="Mã ICD10"
                 className="font-mono text-center"
                 value={diagnosisInfo.transferDiagnosis.code}
                 onChange={(e) => handleChange(['transferDiagnosis', 'code'], e.target.value)}
+                disabled={readOnly}
              />
           </div>
         </div>
@@ -61,12 +65,14 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                 placeholder="Tên chẩn đoán"
                 value={diagnosisInfo.kkbDiagnosis.name}
                 onChange={(e) => handleChange(['kkbDiagnosis', 'name'], e.target.value)}
+                disabled={readOnly}
              />
              <Input 
                 placeholder="Mã ICD10"
                 className="font-mono text-center"
                 value={diagnosisInfo.kkbDiagnosis.code}
                 onChange={(e) => handleChange(['kkbDiagnosis', 'code'], e.target.value)}
+                disabled={readOnly}
              />
           </div>
         </div>
@@ -79,12 +85,14 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                 placeholder="Tên chẩn đoán"
                 value={diagnosisInfo.deptDiagnosis.name}
                 onChange={(e) => handleChange(['deptDiagnosis', 'name'], e.target.value)}
+                disabled={readOnly}
              />
              <Input 
                 placeholder="Mã ICD10"
                 className="font-mono text-center"
                 value={diagnosisInfo.deptDiagnosis.code}
                 onChange={(e) => handleChange(['deptDiagnosis', 'code'], e.target.value)}
+                disabled={readOnly}
              />
           </div>
           <div className="flex gap-6 mt-2">
@@ -93,6 +101,7 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                   id="isSurgery" 
                   checked={diagnosisInfo.deptDiagnosis.isSurgery}
                   onCheckedChange={(checked) => handleChange(['deptDiagnosis', 'isSurgery'], checked)}
+                  disabled={readOnly}
                 />
                 <label htmlFor="isSurgery" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Có phẫu thuật
@@ -103,6 +112,7 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                   id="isProcedure" 
                   checked={diagnosisInfo.deptDiagnosis.isProcedure}
                   onCheckedChange={(checked) => handleChange(['deptDiagnosis', 'isProcedure'], checked)}
+                  disabled={readOnly}
                 />
                 <label htmlFor="isProcedure" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Có thủ thuật
@@ -123,11 +133,13 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                    <Input 
                       value={diagnosisInfo.dischargeDiagnosis.mainDisease.name}
                       onChange={(e) => handleChange(['dischargeDiagnosis', 'mainDisease', 'name'], e.target.value)}
+                      disabled={readOnly}
                    />
                    <Input 
                       className="font-mono text-center"
                       value={diagnosisInfo.dischargeDiagnosis.mainDisease.code}
                       onChange={(e) => handleChange(['dischargeDiagnosis', 'mainDisease', 'code'], e.target.value)}
+                      disabled={readOnly}
                    />
                 </div>
               </div>
@@ -139,11 +151,13 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                    <Input 
                       value={diagnosisInfo.dischargeDiagnosis.comorbidities.name}
                       onChange={(e) => handleChange(['dischargeDiagnosis', 'comorbidities', 'name'], e.target.value)}
+                      disabled={readOnly}
                    />
                    <Input 
                       className="font-mono text-center"
                       value={diagnosisInfo.dischargeDiagnosis.comorbidities.code}
                       onChange={(e) => handleChange(['dischargeDiagnosis', 'comorbidities', 'code'], e.target.value)}
+                      disabled={readOnly}
                    />
                 </div>
               </div>
@@ -154,6 +168,7 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                       id="isAccident" 
                       checked={diagnosisInfo.dischargeDiagnosis.isAccident}
                       onCheckedChange={(checked) => handleChange(['dischargeDiagnosis', 'isAccident'], checked)}
+                      disabled={readOnly}
                     />
                     <label htmlFor="isAccident" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Tai biến y khoa
@@ -164,6 +179,7 @@ export const DiagnosisSection = ({ formData, setFormData }: DiagnosisSectionProp
                       id="isComplication" 
                       checked={diagnosisInfo.dischargeDiagnosis.isComplication}
                       onCheckedChange={(checked) => handleChange(['dischargeDiagnosis', 'isComplication'], checked)}
+                      disabled={readOnly}
                     />
                     <label htmlFor="isComplication" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Biến chứng

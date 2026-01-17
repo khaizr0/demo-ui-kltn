@@ -42,6 +42,7 @@ export const PatientTableRow = ({ patient }: PatientTableRowProps) => {
           </div>
         </div>
       </TableCell>
+      <TableCell className="text-gray-600 font-mono text-xs">{patient.cccd || "---"}</TableCell>
       <TableCell className="text-gray-600">{formatDate(patient.dob)}</TableCell>
       <TableCell className="text-gray-600">
         {patient.age} / {patient.gender}

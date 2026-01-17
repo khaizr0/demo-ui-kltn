@@ -7,12 +7,14 @@ import type { Record } from "@/types";
 interface ExaminationSectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const ExaminationSection = ({ formData, setFormData }: ExaminationSectionProps) => {
+export const ExaminationSection = ({ formData, setFormData, readOnly = false }: ExaminationSectionProps) => {
   const content = formData.medicalRecordContent;
 
   const handleChange = (field: string, value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       return {
@@ -26,6 +28,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
   };
 
   const handleNestedChange = (parent: string, field: string, value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       // @ts-ignore
@@ -53,6 +56,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
               value={content.overallExamination}
               onChange={(e) => handleChange("overallExamination", e.target.value)}
               className="min-h-[80px]"
+              disabled={readOnly}
             />
         </div>
         
@@ -64,6 +68,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                     <Input 
                         value={content.vitalSigns?.pulse || ""}
                         onChange={(e) => handleNestedChange("vitalSigns", "pulse", e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
                 <div className="space-y-1">
@@ -71,6 +76,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                     <Input 
                         value={content.vitalSigns?.temperature || ""}
                         onChange={(e) => handleNestedChange("vitalSigns", "temperature", e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
                   <div className="space-y-1">
@@ -78,6 +84,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                     <Input 
                         value={content.vitalSigns?.bloodPressure || ""}
                         onChange={(e) => handleNestedChange("vitalSigns", "bloodPressure", e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
                   <div className="space-y-1">
@@ -85,6 +92,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                     <Input 
                         value={content.vitalSigns?.respiratoryRate || ""}
                         onChange={(e) => handleNestedChange("vitalSigns", "respiratoryRate", e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
                   <div className="space-y-1">
@@ -92,6 +100,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                     <Input 
                         value={content.vitalSigns?.weight || ""}
                         onChange={(e) => handleNestedChange("vitalSigns", "weight", e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
             </div>
@@ -106,6 +115,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                         className="h-20"
                         value={content.organs?.circulatory || ""}
                         onChange={(e) => handleNestedChange("organs", "circulatory", e.target.value)}
+                        disabled={readOnly}
                       />
                 </div>
                   <div className="space-y-1">
@@ -114,6 +124,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                         className="h-20"
                         value={content.organs?.respiratory || ""}
                         onChange={(e) => handleNestedChange("organs", "respiratory", e.target.value)}
+                        disabled={readOnly}
                       />
                 </div>
                   <div className="space-y-1">
@@ -122,6 +133,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                         className="h-20"
                         value={content.organs?.digestive || ""}
                         onChange={(e) => handleNestedChange("organs", "digestive", e.target.value)}
+                        disabled={readOnly}
                       />
                 </div>
                 <div className="space-y-1">
@@ -130,6 +142,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                         className="h-20"
                         value={content.organs?.neurological || ""}
                         onChange={(e) => handleNestedChange("organs", "neurological", e.target.value)}
+                        disabled={readOnly}
                       />
                 </div>
                   <div className="col-span-1 md:col-span-2 space-y-1">
@@ -138,6 +151,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
                         className="h-20"
                         value={content.organs?.endocrineAndOthers || ""}
                         onChange={(e) => handleNestedChange("organs", "endocrineAndOthers", e.target.value)}
+                        disabled={readOnly}
                       />
                 </div>
             </div>
@@ -149,6 +163,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
               value={content.clinicalTests}
               onChange={(e) => handleChange("clinicalTests", e.target.value)}
               className="min-h-[80px]"
+              disabled={readOnly}
             />
         </div>
           <div className="space-y-2">
@@ -157,6 +172,7 @@ export const ExaminationSection = ({ formData, setFormData }: ExaminationSection
               value={content.summary}
               onChange={(e) => handleChange("summary", e.target.value)}
               className="min-h-[100px]"
+              disabled={readOnly}
             />
         </div>
       </CardContent>

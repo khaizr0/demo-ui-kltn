@@ -38,6 +38,7 @@ export const PatientTable = ({ patients }: PatientTableProps) => {
             <TableRow className="bg-gray-50 hover:bg-gray-50">
               <TableHead className="w-24 font-semibold text-gray-700">Mã BN</TableHead>
               <TableHead className="font-semibold text-gray-700">Họ và Tên</TableHead>
+              <TableHead className="font-semibold text-gray-700">Số CCCD</TableHead>
               <TableHead className="font-semibold text-gray-700">Ngày Sinh</TableHead>
               <TableHead className="font-semibold text-gray-700">Tuổi / Giới</TableHead>
               <TableHead className="font-semibold text-gray-700">Địa chỉ</TableHead>
@@ -52,7 +53,7 @@ export const PatientTable = ({ patients }: PatientTableProps) => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center">
+                <TableCell colSpan={8} className="h-32 text-center">
                   <div className="flex flex-col items-center justify-center text-gray-500">
                     <FileText size={48} className="text-gray-300 mb-4" />
                     <span className="text-lg font-medium text-gray-600">

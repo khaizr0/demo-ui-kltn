@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Save, Plus, FileText, User, Activity, LogOut, ClipboardList, Thermometer, Pill, ChevronDown, ChevronRight, Stethoscope } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Plus, FileText, User, Activity, LogOut, ClipboardList, Thermometer, Pill, ChevronDown, ChevronRight, Stethoscope, Download as DownloadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -21,6 +21,7 @@ interface RecordFormProps {
   initialType?: "internal" | "surgery";
   onSubmit: (data: Record) => void;
   onCancel: () => void;
+  readOnly?: boolean;
 }
 
 const createInitialRecord = (patient: Patient, type: "internal" | "surgery" = "internal"): Record => {
@@ -180,8 +181,9 @@ const getFlattenedSections = () => {
   return flattened;
 };
 
-export const RecordForm = ({ record, patient, mode, initialType = "internal", onSubmit, onCancel }: RecordFormProps) => {
+export const RecordForm = ({ record, patient, mode, initialType = "internal", onSubmit, onCancel, readOnly = false }: RecordFormProps) => {
   const [formData, setFormData] = useState<Record | null>(null);
+  const [editablePatient, setEditablePatient] = useState<Patient>(patient);
   const [activeTab, setActiveTab] = useState("details"); // 'details' or 'documents'
   
   // Initialize with the first section
@@ -193,14 +195,19 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
   useEffect(() => {
     if (mode === "create" && patient) {
       setFormData(createInitialRecord(patient, initialType));
+      setEditablePatient(patient);
     } else if (mode === "edit" && record) {
       setFormData(prepareRecordData(record));
+      // In edit mode, we might want to update patient info from record if it was stored there, 
+      // but currently record only has patientId. We assume patient prop is up to date or passed correctly.
+      setEditablePatient(patient); 
     }
   }, [mode, record, patient, initialType]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (formData) {
+    if (formData && !readOnly) {
+      // In a real app, we would also submit editablePatient to update patient details
       onSubmit(formData);
     }
   };
@@ -241,12 +248,16 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
     }
   };
 
+  const pageTitle = readOnly 
+    ? "Chi Tiết Hồ Sơ Bệnh Án"
+    : isCreate ? "Tạo Hồ Sơ Bệnh Án Mới" : "Chỉnh Sửa Hồ Sơ Bệnh Án";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 h-[calc(100vh-100px)] flex flex-col">
       <div className="flex-none flex items-center justify-between mb-2 border-b border-gray-200 pb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            {isCreate ? "Tạo Hồ Sơ Bệnh Án Mới" : "Chỉnh Sửa Hồ Sơ Bệnh Án"}
+            {pageTitle}
             <span className="text-gray-400 font-light">|</span>
             <span className="text-vlu-red">{typeLabel}</span>
           </h1>
@@ -255,11 +266,19 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
           </p>
         </div>
         <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>Hủy bỏ</Button>
-          <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[120px]">
-            {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
-            {isCreate ? "Tạo Hồ Sơ" : "Lưu Thay Đổi"}
-          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>{readOnly ? "Quay lại" : "Hủy bỏ"}</Button>
+          {readOnly && (
+            <Button type="button" className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2">
+              <DownloadIcon size={18} />
+              Xuất PDF
+            </Button>
+          )}
+          {!readOnly && (
+            <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[120px]">
+                {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
+                {isCreate ? "Tạo Hồ Sơ" : "Lưu Thay Đổi"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -348,14 +367,14 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
             <div className="flex-1 w-full min-w-0 h-full overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-full flex flex-col">
                  <div className="flex-1">
-                    {activeSection === "administrative" && <AdministrativeSection patient={patient} />}
-                    {activeSection === "management" && <PatientManagementSection formData={formData} setFormData={setFormData} />}
-                    {activeSection === "diagnosis" && <DiagnosisSection formData={formData} setFormData={setFormData} />}
-                    {activeSection === "discharge" && <DischargeStatusSection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "administrative" && <AdministrativeSection patient={editablePatient} setPatient={setEditablePatient} readOnly={readOnly} />}
+                    {activeSection === "management" && <PatientManagementSection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
+                    {activeSection === "diagnosis" && <DiagnosisSection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
+                    {activeSection === "discharge" && <DischargeStatusSection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
                     
-                    {activeSection === "history" && <MedicalHistorySection formData={formData} setFormData={setFormData} />}
-                    {activeSection === "examination" && <ExaminationSection formData={formData} setFormData={setFormData} />}
-                    {activeSection === "treatment" && <TreatmentSection formData={formData} setFormData={setFormData} />}
+                    {activeSection === "history" && <MedicalHistorySection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
+                    {activeSection === "examination" && <ExaminationSection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
+                    {activeSection === "treatment" && <TreatmentSection formData={formData} setFormData={setFormData} readOnly={readOnly} />}
                  </div>
               
                   {/* Navigation Footer */}
@@ -384,16 +403,18 @@ export const RecordForm = ({ record, patient, mode, initialType = "internal", on
 
         <TabsContent value="documents" className="mt-6 animate-in fade-in slide-in-from-bottom-2 flex-1 overflow-hidden">
              <div className="h-full overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-10">
-                <DocumentSection formData={formData} setFormData={setFormData} />
+                <DocumentSection formData={formData} setFormData={setFormData} readOnly={readOnly} />
                 
                 <div className="mt-8 flex justify-between items-center pt-6 border-t border-gray-200">
                     <Button type="button" variant="outline" onClick={() => { setActiveTab("details"); setActiveSection("treatment"); }}>
                       <ArrowLeft size={16} className="mr-2" /> Quay lại: Chi Tiết Bệnh Án
                     </Button>
-                    <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[150px]">
-                        {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
-                        {isCreate ? "Hoàn tất & Tạo" : "Lưu Thay Đổi"}
-                    </Button>
+                    {!readOnly && (
+                        <Button type="button" onClick={() => handleSubmit()} className="bg-vlu-red hover:bg-red-800 text-white min-w-[150px]">
+                            {isCreate ? <Plus size={18} className="mr-2" /> : <Save size={18} className="mr-2" />}
+                            {isCreate ? "Hoàn tất & Tạo" : "Lưu Thay Đổi"}
+                        </Button>
+                    )}
                 </div>
             </div>
         </TabsContent>

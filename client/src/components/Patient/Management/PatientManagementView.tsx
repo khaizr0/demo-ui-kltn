@@ -11,7 +11,8 @@ export const PatientManagementView = () => {
      return patients.filter(
       (p) =>
         p.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.toLowerCase().includes(searchTerm.toLowerCase())
+        p.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.cccd && p.cccd.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [patients, searchTerm]);
 

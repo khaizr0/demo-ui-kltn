@@ -30,7 +30,8 @@ export const useRecordFilter = (records: Record[], initialSearch: string = "") =
       const matchesSearch =
         record.patientName.toLowerCase().includes(term) ||
         record.id.toLowerCase().includes(term) ||
-        (record.patientId && record.patientId.toLowerCase().includes(term));
+        (record.patientId && record.patientId.toLowerCase().includes(term)) ||
+        (record.cccd && record.cccd.toLowerCase().includes(term));
 
       const matchesType = filterType === "all" || record.type === filterType;
       return matchesSearch && matchesType;

@@ -6,12 +6,14 @@ import type { Record } from "@/types";
 interface TreatmentSectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const TreatmentSection = ({ formData, setFormData }: TreatmentSectionProps) => {
+export const TreatmentSection = ({ formData, setFormData, readOnly = false }: TreatmentSectionProps) => {
   const content = formData.medicalRecordContent;
 
   const handleChange = (field: string, value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       return {
@@ -33,6 +35,7 @@ export const TreatmentSection = ({ formData, setFormData }: TreatmentSectionProp
               value={content.prognosis}
               onChange={(e) => handleChange("prognosis", e.target.value)}
               className="min-h-[60px]"
+              disabled={readOnly}
             />
         </div>
         <div className="space-y-2">
@@ -41,6 +44,7 @@ export const TreatmentSection = ({ formData, setFormData }: TreatmentSectionProp
               value={content.treatmentPlan}
               onChange={(e) => handleChange("treatmentPlan", e.target.value)}
               className="min-h-[80px]"
+              disabled={readOnly}
             />
         </div>
       </CardContent>

@@ -14,12 +14,14 @@ import type { Record } from "@/types";
 interface DischargeStatusSectionProps {
   formData: Record;
   setFormData: React.Dispatch<React.SetStateAction<Record | null>>;
+  readOnly?: boolean;
 }
 
-export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatusSectionProps) => {
+export const DischargeStatusSection = ({ formData, setFormData, readOnly = false }: DischargeStatusSectionProps) => {
   const dischargeStatusInfo = formData.dischargeStatusInfo;
 
   const handleChange = (path: string[], value: any) => {
+    if (readOnly) return;
     setFormData((prev) => {
       if (!prev) return null;
       
@@ -47,6 +49,7 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                 <Select 
                   value={dischargeStatusInfo.treatmentResult} 
                   onValueChange={(val) => handleChange(['treatmentResult'], val)}
+                  disabled={readOnly}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn kết quả" />
@@ -65,6 +68,7 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                 <Input 
                    value={dischargeStatusInfo.pathology}
                    onChange={(e) => handleChange(['pathology'], e.target.value)}
+                   disabled={readOnly}
                 />
             </div>
         </div>
@@ -79,6 +83,7 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                         type="datetime-local"
                         value={dischargeStatusInfo.deathStatus.time?.replace(" ", "T") || ""}
                         onChange={(e) => handleChange(['deathStatus', 'time'], e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
                  <div className="space-y-2">
@@ -86,6 +91,7 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                     <Input 
                         value={dischargeStatusInfo.deathStatus.cause}
                         onChange={(e) => handleChange(['deathStatus', 'cause'], e.target.value)}
+                        disabled={readOnly}
                     />
                 </div>
              </div>
@@ -97,12 +103,14 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                         placeholder="Tên nguyên nhân"
                         value={dischargeStatusInfo.mainCauseOfDeath.name}
                         onChange={(e) => handleChange(['mainCauseOfDeath', 'name'], e.target.value)}
+                        disabled={readOnly}
                     />
                     <Input 
                         placeholder="Mã ICD10"
                         className="font-mono text-center"
                         value={dischargeStatusInfo.mainCauseOfDeath.code}
                         onChange={(e) => handleChange(['mainCauseOfDeath', 'code'], e.target.value)}
+                        disabled={readOnly}
                     />
                  </div>
              </div>
@@ -113,6 +121,7 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                       id="isAutopsy" 
                       checked={dischargeStatusInfo.isAutopsy}
                       onCheckedChange={(checked) => handleChange(['isAutopsy'], checked)}
+                      disabled={readOnly}
                     />
                     <label htmlFor="isAutopsy" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       Có khám nghiệm tử thi
@@ -127,11 +136,13 @@ export const DischargeStatusSection = ({ formData, setFormData }: DischargeStatu
                         <Input 
                             value={dischargeStatusInfo.autopsyDiagnosis.name}
                             onChange={(e) => handleChange(['autopsyDiagnosis', 'name'], e.target.value)}
+                            disabled={readOnly}
                         />
                         <Input 
                             className="font-mono text-center"
                             value={dischargeStatusInfo.autopsyDiagnosis.code}
                             onChange={(e) => handleChange(['autopsyDiagnosis', 'code'], e.target.value)}
+                            disabled={readOnly}
                         />
                      </div>
                  </div>
